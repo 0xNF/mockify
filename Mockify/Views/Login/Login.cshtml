@@ -1,0 +1,103 @@
+﻿@using Mockify.ViewModels;
+@model LoginViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Login";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Mockify</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/css/Mockify.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/Mockify.min.css" asp-append-version="true" />
+    </environment>
+
+
+</head>
+
+<body>
+    <div id="header" class="head small" style="padding: 10px 0 0">
+        <a class="mockify-logo" href="/" tabindex="-1" title="Mockify">Mockify</a>
+    </div>
+
+    <div class="container-fluid login">
+        <div class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <a class="btn btn-sm btn-block btn-facebook" href="https://www.facebook.com/v2.3/dialog/oauth?client_id=174829003346&state=AQDNnyjkUjHZVyqWrrnU5ecdvv5nVnMQkKtmay4LI2tUaFmAlSeUoIeXi72CmkDQtGC2RrVBMUPKVjrlJaB8ag&redirect_uri=https%3A%2F%2Faccounts.spotify.com%2Fapi%2Ffacebook%2Foauth%2Faccess_token">Log in with Facebook</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <strong class="divider-title">or</strong>
+                </div>
+            </div>
+            <form asp-action="login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label sr-only">Email address or Username</label>
+                            <input asp-for="Email"
+                                   class="form-control input-with-feedback" placeholder="email address or username"
+                                   required autofocus autocomplete="off" type="text" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label asp-for="Password" class="control-label sr-only">Password</label>
+                            <input asp-for="Password" 
+                                   class="form-control input-with-feedback" placeholder="password"
+                                   required autofocus autocomplete="off" type="password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row row-submit">
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="checkbox">
+                            <label asp-for="RememberMe">
+                                <input asp-for="RememberMe" />
+                                @Html.DisplayNameFor(m => m.RememberMe)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-spotify btn-green">Log in</button>
+                    </div>
+                </div>
+            </form>
+            <div class="col-xs-12">
+                <div class="divider"></div>
+                <p class="text-muted disclaimer">
+                    If you click "Log in with Facebook" and are not a Spotify user, you will be registered and you agree to the Spotify's
+                    <a href="localhost:5000/us/legal/end-user-agreement/plain/" target="_blank">Terms &Aacute; Conditions</a>
+                    and
+                    <a href="localhost:5000/us/legal/privacy-policy/plain/" target="_blank">Privacy Policy</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</body>
+</html>
+
+

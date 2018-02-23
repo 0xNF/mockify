@@ -1,0 +1,80 @@
+﻿@using Mockify.ViewModels;
+@model Paging<Mockify.Models.ApplicationUser>
+
+    <h2>List of Users</h2>
+    <div>
+        <div id="PageControls">
+
+            <a class="btn btn-default btn-xs"
+               href="/users?offset=@( (Model.Offset-Model.Limit) < 0 ? 0 : (Model.Offset-Model.Limit))&limit=@Model.Limit">
+                Previous
+            </a>
+
+            <span id="CurrentPage">@Model.CurrentPage</span>/<span id="TotalPages">@Model.TotalPages</span>
+
+            <a class="btn btn-default btn-xs"
+               href="/users?offset=@( (Model.Offset+Model.Limit) >= Model.Total ? (Model.Total-Model.Limit) : (Model.Offset+Model.Limit))&limit=@Model.Limit">Next</a>
+        </div>
+        <div style="max-height: 400px; overflow: scroll">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            UserID (internal)
+                        </th>
+                        <th>
+                            Birthdate
+                        </th>
+                        <th>
+                            Country
+                        </th>
+                        <th>
+                            Product
+                        </th>
+                        <th>
+                            Display Name
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                        <th>
+                            Followers
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Birthdate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Country)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Product)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DisplayName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Followers)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+                </tbody>
+            </table>
+        </div>
+     </div>

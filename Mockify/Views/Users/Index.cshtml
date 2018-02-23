@@ -1,0 +1,29 @@
+﻿@using Mockify.ViewModels;
+@model UserPageViewModel
+@{
+    ViewData["Title"] = "Users";
+}
+
+<h2>Users</h2>
+
+
+
+
+<div id="createAUserZone">
+    <h3>Create a User</h3>
+    <div style="display: flex">
+        <div style="width: 1000px">
+            @{Html.RenderPartial("CreateSingleUser", Model.CreateSingleViewModel); }
+        </div>
+        <div style="width: 1000px">
+            @{Html.RenderPartial("CreateManyUsers", Model.CreateManyViewModel); }
+        </div>
+        
+    </div>
+    @{Html.RenderPartial("ViewAllusers", Model.UserListViewModel);}
+    <div id="restoreUsersSection" class="pull-right">
+        <a class="btn btn-danger btn-sm" href="/users/restoreusers">Restore Users</a>
+        @*@{Html.RenderPartial("RestoreUsers");}*@
+    </div>
+
+</div>

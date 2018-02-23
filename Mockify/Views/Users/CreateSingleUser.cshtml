@@ -1,0 +1,251 @@
+﻿@using Mockify.Models.Spotify;
+@model Mockify.ViewModels.CreateUserViewModel
+
+<h4>Create a Single User</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CreateUser" asp-controller="Users" asp-route-returnurl="/users" >
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="DisplayName" class="control-label"></label>
+                <input id="InputDisplayName" asp-for="DisplayName" class="form-control" />
+                <span asp-validation-for="DisplayName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input required="required" id="InputPassword" asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input id="InputEmail" asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BirthDate" class="control-label"></label>
+                <input id="InputBirthDate" asp-for="BirthDate" class="form-control" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Country" class="control-label"></label>
+                @*<input id="InputCountry" asp-for="Country" class="form-control" />*@
+                <select required="required" id="InputCountry" asp-for="Country" class="form-control">
+                    @foreach(Country c in Country.SpotifyMarkets) {
+                        { <option id="Country_@c.ISO_ALPHA_2" val="@c.ISO_ALPHA_2">@c.FormalName</option> }
+                    }
+                </select>
+                <span asp-validation-for="Country" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Product" class="control-label"></label>
+                @*<input id="InputProduct" asp-for="Product" class="form-control" />*@
+                <select required="required" id="InputProduct" asp-for="Product" class="form-control">
+                    @foreach(SpotifyAccountTypes t in SpotifyAccountTypes.AllValues) {
+                        { <option id="Product_@t.Id" val="@t.Id">@t.Name</option> }
+                    }
+                </select>
+                <span asp-validation-for="Product" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+                <button type="button" class="btn btn-default" onclick="GenerateRandom(0)">Random</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    const alphaUpper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const alphaLower = 'abcdefghijklmnopqrstuvwxyz'.split('');
+    const numeric = '0123456789'.split('');
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function guid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        }
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+            s4() + '-' + s4() + s4() + s4();
+    }
+
+
+    function randomLower(min, max, inclSpace) {
+        const len = getRandomInt(min, max);
+        let str = "";
+        for (let i = 0; i < len; i++) {
+                modder = getRandomInt(0, alphaLower.length - 1);
+                str += alphaLower[modder];
+                break;
+            }
+        return str;
+    }
+
+    function randomLowerNumeric(min, max, inclSpace) {
+        const len = getRandomInt(min, max);
+        let str = "";
+        for (let i = 0; i < len; i++) {
+            let which = getRandomInt(0, inclSpace ? 2 : 1);
+            switch (which) {
+                case 0:
+                    modder = getRandomInt(0, alphaLower.length - 1);
+                    str += alphaLower[modder];
+                    break;
+                case 1:
+                    modder = getRandomInt(0, numeric.length - 1);
+                    str += numeric[modder];
+                    break;
+                case 2:
+                    str += " ";
+                    break;
+                default:
+                    break;
+            }
+        }
+        return str;
+    }
+
+    function randomAlphaNumeric(min, max, inclSpace) {
+        const len = getRandomInt(min, max);
+        let str = "";
+        for (let i = 0; i < len; i++) {
+            let which = getRandomInt(0, inclSpace ? 3 : 2);
+            switch (which) {
+                case 0:
+                    modder = getRandomInt(0, alphaUpper.length - 1);
+                    str += alphaUpper[modder];
+                    break;
+                case 1:
+                    modder = getRandomInt(0, alphaLower.length - 1);
+                    str += alphaLower[modder];
+                    break;
+                case 2:
+                    modder = getRandomInt(0, numeric.length - 1);
+                    str += numeric[modder];
+                    break;
+                case 3:
+                    str += " ";
+                    break;
+                default:
+                    break;
+            }
+        }
+        return str;
+    }
+
+    function randomAlphaNumeric(min, max, inclSpace) {
+        const len = getRandomInt(min, max);
+        let str = "";
+        for (let i = 0; i < len; i++) {
+            let which = getRandomInt(0, inclSpace ? 3 : 2);
+            switch (which) {
+                case 0:
+                    modder = getRandomInt(0, alphaUpper.length - 1);
+                    str += alphaUpper[modder];
+                    break;
+                case 1:
+                    modder = getRandomInt(0, alphaLower.length - 1);
+                    str += alphaLower[modder];
+                    break;
+                case 2:
+                    modder = getRandomInt(0, numeric.length - 1);
+                    str += numeric[modder];
+                    break;
+                case 3:
+                    str += " ";
+                    break;
+                default:
+                    break;
+            }
+        }
+        return str;
+    }
+
+    function randomUserId() {
+        return guid();
+    }
+
+    function randomPass() {
+        return randomAlphaNumeric(8, 16, false);
+    }
+
+    function randomDisplay() {
+        const NoName = getRandomInt(0, 1) === 0;
+        if (NoName) {
+            return "";
+        } else {
+            return randomAlphaNumeric(2, 10, true);
+        }
+    }
+
+    function randomEmail() {
+        const front = randomAlphaNumeric(2, 20, false);
+        const back = randomLower(2, 20, false);
+        const router = randomLowerNumeric(2, 5, false);
+
+        return front + "@@" + back + "." + router ;
+    }
+
+
+    function randomBirthDay() {
+        const month = getRandomInt(1, 12);
+        const day = getRandomInt(1, 28); // Cheat to make sure we never create an invalid date. If you want real validation, do it on the server.
+        const year = getRandomInt(1900, 2017);
+
+        return month + "/" + day + "/" + year;
+    }
+
+    function randomCountry() {
+        const whichIdx = getRandomInt(0, @Country.SpotifyMarkets.Count-1);
+        const vval = $("#InputCountry").children()[whichIdx].value;
+        return vval;
+    }
+
+    function randomProduct() {
+        const whichIdx = getRandomInt(0, @SpotifyAccountTypes.AllValues.Count -1);
+        const vval = $("#InputProduct").children()[whichIdx].value;
+        return vval;
+    }
+
+    function GenerateRandom(id) {
+        switch (id) {
+            case 0:
+                for (let i = 1; i < 9; i++) {
+                    GenerateRandom(i);
+                }
+                break;
+            case 1:
+                $("#single_UserId").val(randomUserId());
+                break;
+            case 2:
+                $("#InputDisplayName").val(randomDisplay());
+                break;
+            case 3:
+                $("#InputPassword").val(randomPass());
+                break;
+            case 4:
+                $("#InputEmail").val(randomEmail());
+                break;
+            case 6:
+                $("#InputBirthDate").val(randomBirthDay());
+                break;
+            case 7:
+                let vv = randomCountry();
+                console.log(vv);
+                $("#InputCountry").val(vv);
+                break;
+            case 8:
+                $("#InputProduct").val(randomProduct());
+                break;
+            default:
+                break
+        }
+    }
+</script>
+

@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <UserSecretsId>aspnet-Mockify-0AF903F1-0B3A-4F8F-9B4D-463CC9745CAA</UserSecretsId>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.Validation" Version="2.0.0-rc1-final" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.1" />
+    <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.0" />
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\libraries\AspNet.Security.OpenIdConnect.Server\src\AspNet.Security.OpenIdConnect.Extensions\AspNet.Security.OpenIdConnect.Extensions.csproj" />
+    <ProjectReference Include="..\..\libraries\AspNet.Security.OpenIdConnect.Server\src\AspNet.Security.OpenIdConnect.Primitives\AspNet.Security.OpenIdConnect.Primitives.csproj" />
+    <ProjectReference Include="..\..\libraries\AspNet.Security.OpenIdConnect.Server\src\AspNet.Security.OpenIdConnect.Server\AspNet.Security.OpenIdConnect.Server.csproj" />
+  </ItemGroup>
+
+</Project>

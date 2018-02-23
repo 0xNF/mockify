@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2027
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mockify", "Mockify\Mockify.csproj", "{27D010F4-3C47-436F-B232-C949CF271AA9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNet.Security.OpenIdConnect.Server", "..\libraries\AspNet.Security.OpenIdConnect.Server\src\AspNet.Security.OpenIdConnect.Server\AspNet.Security.OpenIdConnect.Server.csproj", "{FF44C9DF-E474-48DF-9C04-CBC1D4293BED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNet.Security.OpenIdConnect.Extensions", "..\libraries\AspNet.Security.OpenIdConnect.Server\src\AspNet.Security.OpenIdConnect.Extensions\AspNet.Security.OpenIdConnect.Extensions.csproj", "{EC0673D0-E9D1-4E59-B983-730DB561543E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNet.Security.OpenIdConnect.Primitives", "..\libraries\AspNet.Security.OpenIdConnect.Server\src\AspNet.Security.OpenIdConnect.Primitives\AspNet.Security.OpenIdConnect.Primitives.csproj", "{FDE47440-412D-4438-AC7B-7E828E0655D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{27D010F4-3C47-436F-B232-C949CF271AA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27D010F4-3C47-436F-B232-C949CF271AA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27D010F4-3C47-436F-B232-C949CF271AA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27D010F4-3C47-436F-B232-C949CF271AA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF44C9DF-E474-48DF-9C04-CBC1D4293BED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF44C9DF-E474-48DF-9C04-CBC1D4293BED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF44C9DF-E474-48DF-9C04-CBC1D4293BED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF44C9DF-E474-48DF-9C04-CBC1D4293BED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC0673D0-E9D1-4E59-B983-730DB561543E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC0673D0-E9D1-4E59-B983-730DB561543E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC0673D0-E9D1-4E59-B983-730DB561543E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC0673D0-E9D1-4E59-B983-730DB561543E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDE47440-412D-4438-AC7B-7E828E0655D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDE47440-412D-4438-AC7B-7E828E0655D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDE47440-412D-4438-AC7B-7E828E0655D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDE47440-412D-4438-AC7B-7E828E0655D6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2E697A75-4C38-49CC-8273-E605C0C42BEA}
+	EndGlobalSection
+EndGlobal

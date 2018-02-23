@@ -1,0 +1,150 @@
+﻿@using Mockify.ViewModels;
+@using Mockify.Models.Spotify;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager;
+@model AuthorizeViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Authorize";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Mockify</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/css/Mockify.css"/>
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/Mockify.min.css" asp-append-version="true" />
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    </environment>
+
+
+</head>
+
+<body>
+    <div id="header" class="head small" style="padding: 10px 0 0">
+        <a class="mockify-logo" href="/" tabindex="-1" title="Mockify">Mockify</a>
+    </div>
+
+    <div class="container-fluid authorize">
+        <div class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="client-info">
+                        <h2 class="client-name">
+                            Connect
+                            <strong>@Model.AppName</strong>
+                            to your Mockify account.
+                        </h2>
+                    </div>
+                    <p class="lead text-center">
+                        @Model.Description
+                    </p>
+                    <p class="text-center">
+                        <strong>
+                            @Model.AppName will be able to receive
+                            <button class="show-client-scopes" style="background-color: transparent; border: 0; text-decoration: underline; margin: 0 -8px;" href="" onclick="toggleScopes()">this Mockify account data</button>.
+                        </strong>
+                    </p>
+                    <ul id="scopeList" class="client-scopes list-unstyled hidden">
+                        @foreach (SpotifyScope s in Model.Scopes) {
+                            <li>@s.Description</li>
+                        }
+                    </ul>
+                    <h3 class="disclaimer text-center">
+                        When you ask for Mockify content, such as music and videos, your request will be sent to Mockify.
+                        Mockify will use this information to deliver the most relevant content and to improve its service.
+                        Mockify is responsible for that information in accordance with its Privacy Policy.
+                    </h3>
+                    <h3 class="disclaimer text-center">
+                        You agree that @Model.AppName is responsible for its use of your information in accordance with its privacy policy.
+                    </h3>
+                </div>
+            </div>
+            <div class="user-info clearfix">
+                <span cass="user-details">
+                    You are logged in as @((await UserManager.GetUserAsync(User)).UserName)
+                    <span>
+                        (
+                        <a href="/login/logout?continue=@Model.AuthUrl">Not you?</a>
+                        )
+                    </span>
+                </span>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    @if (await SignInManager.UserManager.GetUserAsync(this.User) == null) {
+                <a class="btn btn-sm btn-block btn-green btn-spotify" asp-route-returnUrl="@Model.AuthUrl" asp-controller="Login">
+                    Log in to Mockify
+                </a>
+}
+else {
+                <div>
+                    <form asp-action="deny" asp-controller="Authorize" method="post">
+                        <input type="hidden" name="client_id" value="@Model.ClientId" />
+                        <input type="hidden" name="redirect_uri" value="@Model.RedirectUri" />
+                        <input type="hidden" name="response_type" value="@Model.TokenType" />
+                        @if (Model.Scopes.Any()) {
+                            <input type="hidden" name="scope" value="@String.Join(",", Model.Scopes.Select(x => x.Name))" />
+                        }
+                        @if (!String.IsNullOrWhiteSpace(Model.State)) {
+                            <input type="hidden" name="state" value="@Model.State" />
+                         }
+                        <button type="submit" class="auth-deny btn btn-sm btn-black">
+                            Cancel
+                        </button>
+                    </form>
+
+                    <form asp-action="accept" asp-controller="Authorize" method="post">
+                        <input type="hidden" name="client_id" value="@Model.ClientId" />
+                        <input type="hidden" name="redirect_uri" value="@Model.RedirectUri"/>
+                        <input type="hidden" name="response_type" value="@Model.TokenType"/>
+                        @if(Model.Scopes.Any()) {
+                            <input type="hidden" name="scope" value="@String.Join(",", Model.Scopes.Select(x => x.Name))"/>
+                        }
+                        @if(!String.IsNullOrWhiteSpace(Model.State)) {
+                            <input type="hidden" name="state" value="@Model.State"/>
+                        }
+                        <button class="auth-allow btn btn-sm btn-green btn-spotify" type="submit">
+                            Okay
+                        </button>
+                    </form>
+                </div>
+
+                @section Scripts {
+                @await Html.PartialAsync("_ValidationScriptsPartial")
+                }
+}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleScopes() {
+            console.log("ayy");
+            const slist = $("#scopeList");
+            if (slist.hasClass("hidden")) {
+                slist.removeClass("hidden");
+            } else {
+                slist.addClass("hidden");
+            }
+            console.log(slist);
+        }
+    </script>
+</body>
+</html>
+
+

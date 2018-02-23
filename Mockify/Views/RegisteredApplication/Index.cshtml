@@ -1,0 +1,101 @@
+﻿@using Mockify.ViewModels;
+@model RegisteredApplicationViewModel
+@{
+    ViewData["Title"] = Model.ApplicationName;
+}
+
+<div>
+    <h1>@Model.ApplicationName</h1>
+    <form asp-route-returnUrl="@ViewData["ReturnUrl"]" asp-action="UpdateRegisteredApplication" asp-route-clientid="@Model.ClientId" class="form" method="post">
+        <div>
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>
+                                Client Id
+                            </strong>
+                        </td>
+                        <td>
+                            <strong>
+                                @Model.ClientId
+                            </strong>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>
+                                Client Secret
+                            </strong>
+                        </td>
+                        <td>
+                            <strong>
+                                @Model.ClientSecret
+                            </strong>
+                        </td>
+                        <td>
+                            <button type="submit" asp-action="ChangeSecret" asp-route-clientid="@Model.ClientId" class="btn btn-danger">Reset</button>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <label for="ApplicationName">
+                Application Name
+            </label>
+            <input class="form-control validate" name="ApplicationName" maxlength="60" required="required" placeholder="Your application name. Max 60 characters." type="text"
+                   value="@Model.ApplicationName" />
+        </div>
+        <div class="form-group">
+            <label for="ApplicationDescription">
+                Application Description
+            </label>
+            <input class="form-control validate" name="ApplicationDescription" maxlength="250" placeholder="Describe your application. Max 250 characters." type="text"
+                   value="@Model.ApplicationDescription" />
+        </div>
+        <div class="form-group">
+            <label>Redirect URIs</label><br />
+            <button class="btn btn-xs" type="button" onclick="addNewUriSlot()">Add Redirect URI</button>
+            <ul id="listOfRedirectURIs">
+                @for (int i = 0; i < Model.RedirectURIs.Count(); i++) {
+                    <li id="rdi_@i" style="display: contents">
+                        <div>
+                            <input name="redirect_@i" value="@Model.RedirectURIs.ElementAt(i)" type="text" placeholder="Enter a valid Redirect URI here" />
+                            <button class="btn btn-xs" type="button" onclick="removeRedirectUri(@i)">X</button>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+        <button type="submit" asp-action="Deregister" asp-route-clientid="@Model.ClientId" class="btn btn-danger pull-right">Delete Application</button>
+
+    </form>
+
+</div>
+<script type="text/javascript">
+    let count = @Model.RedirectURIs.Count();
+    function addNewUriSlot() {
+        count += 1;
+        const list = $("#listOfRedirectURIs");
+        list.append(
+            "<li style=\"display: contents\" id=\"rdi_" + count + "\">\
+                <div>\
+                    <input name=\"redirect_" + count +"\" value=\"\" type=\"text\" placeholder=\"Enter a valid Redirect URI here\">\
+                    </input>\
+                    <button class=\"btn btn-xs\" type=\"button\" onclick=\"removeRedirectUri(" + count + ")\">X</buitton>\
+                </div>\
+             </li>"
+        );
+    }
+
+    function removeRedirectUri(val) {
+        const item = $("#rdi_" + val);
+        item.remove();
+        count -= 1;
+    }
+</script>
+
