@@ -87,12 +87,27 @@ namespace Mockify.Models {
     public class UserApplicationToken {
 
         [Key]
-        public string Id { get; set; }
-        [ForeignKey("ApplicationUserId")]
-        public string UserId { get; set; }
-        [ForeignKey("RegisteredApplicationId")]
+        public string TokenId { get; set; }
+
         public string ClientId { get; set; }
-        public string OauthToken { get; set; }
-        
+
+        public string TokenType { get; set; } // access, refresh,
+
+        public string TokenValue { get; set; }
     }
+
+    //public class UserApplicationToken {
+
+    //    [Key]
+    //    public string Id { get; set; }
+
+    //    [ForeignKey("ApplicationUserId")]
+    //    public string UserId { get; set; }
+
+    //    [ForeignKey("RegisteredApplicationId")]
+    //    public string ClientId { get; set; }
+
+    //    public string OauthToken { get; set; }
+        
+    //}
 }

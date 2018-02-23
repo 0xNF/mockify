@@ -239,7 +239,7 @@ namespace Mockify.Migrations
 
             modelBuilder.Entity("Mockify.Models.UserApplicationToken", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("TokenId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ApplicationUserId");
@@ -248,11 +248,11 @@ namespace Mockify.Migrations
 
                     b.Property<string>("ClientId");
 
-                    b.Property<string>("OauthToken");
+                    b.Property<string>("TokenType");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("TokenValue");
 
-                    b.HasKey("Id");
+                    b.HasKey("TokenId");
 
                     b.HasIndex("ApplicationUserId");
 

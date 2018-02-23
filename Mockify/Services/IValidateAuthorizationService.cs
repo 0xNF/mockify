@@ -8,5 +8,6 @@ namespace Mockify.Services {
         Task<bool> CheckRedirectURIMatches(string redirectUri, string clientid);
         Task<bool> CheckScopesAreValid(string scope);
         Task<bool> CheckSecretMatchesId(string clientId, string clientSecret);
+        Task<bool> CheckTokenNotRevoked(string user_id, string refreshToken);
     }
 }

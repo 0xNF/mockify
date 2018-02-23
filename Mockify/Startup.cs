@@ -113,6 +113,11 @@ namespace Mockify {
 
 
         private async Task _validateAuthorizationCodeFlow(ValidateAuthorizationRequestContext context) {
+            authservice = context.HttpContext.RequestServices.GetRequiredService<IValidateAuthorizationService>();
+            if (authservice == null) {
+                context.Reject(OpenIdConnectConstants.Errors.ServerError, "Failed to validate this authorization request");
+                return;
+            }
             if (string.IsNullOrEmpty(context.RedirectUri)) {
                 context.Reject(
                     error: OpenIdConnectConstants.Errors.InvalidRequest,
@@ -135,11 +140,6 @@ namespace Mockify {
         }
         // Implement OnValidateAuthorizationRequest to support interactive flows (code/implicit/hybrid).
         public override async Task ValidateAuthorizationRequest(ValidateAuthorizationRequestContext context) {
-            authservice = authservice ?? context.HttpContext.RequestServices.GetRequiredService<IValidateAuthorizationService>();
-            if (authservice == null) {
-                context.Reject(OpenIdConnectConstants.Errors.ServerError, "Failed to validate this authorization request");
-                return;
-            }
             if (!context.Request.IsAuthorizationCodeFlow() 
                 && !context.Request.IsClientCredentialsGrantType()
                 && !context.Request.IsImplicitFlow()) {
@@ -200,6 +200,12 @@ namespace Mockify {
             context.Validate();
         }
         private async Task _validateRefreshTokenRequest(ValidateTokenRequestContext context) {
+            authservice = context.HttpContext.RequestServices.GetRequiredService<IValidateAuthorizationService>();
+            if (authservice == null) {
+                context.Reject(OpenIdConnectConstants.Errors.ServerError, "Failed to validate this authorization request");
+                return;
+            }
+
             // TODO increment user rate limit (nb this increment only happens in Validate)
             if (String.IsNullOrWhiteSpace(context.Request.RefreshToken)) {
                 context.Reject(
@@ -245,7 +251,7 @@ namespace Mockify {
             } else if(!await authservice.CheckSecretMatchesId(context.ClientId, context.ClientSecret)) {
                 context.Reject(OpenIdConnectConstants.Errors.InvalidClient, "The supplied client secret is no longer valid.");
                 return;
-            } else if (await IsTokenRevoked(context.ClientId, context.Request.RefreshToken)) {
+            } else if (!await authservice.CheckTokenNotRevoked(gtype.Value, context.Request.RefreshToken)) {
                 context.Reject(OpenIdConnectConstants.Errors.AccessDenied, "The supplied token has been revoked. Please re-authenticate.");
             }
             else if (!await RequestWithinRateLimits(context.ClientId, userid.Value, gtype.Value)) {
@@ -264,7 +270,7 @@ namespace Mockify {
 
         }
         public override async Task ValidateTokenRequest(ValidateTokenRequestContext context) {
-            authservice = authservice ?? context.HttpContext.RequestServices.GetRequiredService<IValidateAuthorizationService>();
+            authservice = context.HttpContext.RequestServices.GetRequiredService<IValidateAuthorizationService>();
             if (authservice == null) {
                 context.Reject(OpenIdConnectConstants.Errors.ServerError, "Failed to validate this authorization request");
                 return;
@@ -308,7 +314,7 @@ namespace Mockify {
 
         }
         public override async Task HandleTokenRequest(HandleTokenRequestContext context) {
-            authservice = authservice ?? context.HttpContext.RequestServices.GetRequiredService<IValidateAuthorizationService>();
+            authservice = context.HttpContext.RequestServices.GetRequiredService<IValidateAuthorizationService>();
             if (authservice == null) {
                 context.Reject(OpenIdConnectConstants.Errors.ServerError, "Failed to validate this authorization request");
                 return;
@@ -363,12 +369,44 @@ namespace Mockify {
                 var rt = context.Response.RefreshToken;
                 var ei = context.Response.ExpiresIn;
 
+                var authResult = await context.HttpContext.AuthenticateAsync(OpenIdConnectServerDefaults.AuthenticationScheme);
+                string clientid = authResult.Principal.Claims.Where(x => x.Type == "client_id").First().Value;
+                string userid = authResult.Principal.Claims.Where(x => x.Type == "sub").First().Value;
+                
 
+                // Replace the old Tokens with the new ones
+                MockifyDbContext DatabaseContext = context.HttpContext.RequestServices.GetRequiredService<MockifyDbContext>();
+                ApplicationUser au = await DatabaseContext.ApplicationUser.Include(x => x.UserApplicationTokens).Where(x => x.Id == userid).FirstOrDefaultAsync();
+                foreach (UserApplicationToken old in au.UserApplicationTokens.Where(x => x.ClientId == clientid)) {
+                    au.UserApplicationTokens.Remove(old);
+                }
+                au.UserApplicationTokens.Add(new UserApplicationToken() { ClientId = clientid, TokenType = "access_token", TokenValue = at });
+                au.UserApplicationTokens.Add(new UserApplicationToken() { ClientId = clientid, TokenType = "refresh_token", TokenValue = rt });
+
+                await DatabaseContext.SaveChangesAsync();
                 _stripUnnecessaryResponseParameters(context);
             }
         }
         private async Task _applyRefreshToken(ApplyTokenResponseContext context) {
-            _stripUnnecessaryResponseParameters(context);
+            if (!String.IsNullOrWhiteSpace(context.Response.AccessToken)) {
+                var at = context.Response.AccessToken;
+
+                var authResult = await context.HttpContext.AuthenticateAsync(OpenIdConnectServerDefaults.AuthenticationScheme);
+                string clientid = authResult.Principal.Claims.Where(x => x.Type == "client_id").First().Value;
+                string userid = authResult.Principal.Claims.Where(x => x.Type == "sub").First().Value;
+
+
+                // Replace the old Tokens with the new ones
+                MockifyDbContext DatabaseContext = context.HttpContext.RequestServices.GetRequiredService<MockifyDbContext>();
+                ApplicationUser au = await DatabaseContext.ApplicationUser.Include(x=>x.UserApplicationTokens).Where(x=>x.Id == userid).FirstOrDefaultAsync();
+                foreach (UserApplicationToken old in au.UserApplicationTokens.Where(x => x.ClientId == clientid && x.TokenType == "access_token").ToList()) {
+                    au.UserApplicationTokens.Remove(old);
+                }
+                au.UserApplicationTokens.Add(new UserApplicationToken() { ClientId = clientid, TokenType = "access_token", TokenValue = at });
+
+                await DatabaseContext.SaveChangesAsync();
+                _stripUnnecessaryResponseParameters(context);
+            }
         }
         private async Task _applyImplicitToken(ApplyTokenResponseContext context) {
 

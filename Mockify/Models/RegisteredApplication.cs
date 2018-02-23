@@ -38,5 +38,4 @@ namespace Mockify.Models {
             return GetRandomString(32, availablechars);
         }
     }
-
 }
