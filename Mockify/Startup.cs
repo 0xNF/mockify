@@ -46,6 +46,7 @@ namespace Mockify {
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IValidateAuthorizationService, ValidationAuthorizationService>();
+            services.AddTransient<IRateLimitService, RateLimitService>();
 
 
             services.AddAuthentication().AddOpenIdConnectServer(options => {

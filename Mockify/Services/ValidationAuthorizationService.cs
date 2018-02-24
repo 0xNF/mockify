@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Mockify.Data;
 using Mockify.Models;
 using System;
@@ -15,14 +16,17 @@ namespace Mockify.Services {
 
         MockifyDbContext _mc;
         UserManager<ApplicationUser> _um;
+        ILogger<ValidationAuthorizationService> _logger;
 
-        public ValidationAuthorizationService(MockifyDbContext mc, UserManager<ApplicationUser> um) {
+        public ValidationAuthorizationService(MockifyDbContext mc, UserManager<ApplicationUser> um, ILogger<ValidationAuthorizationService> logger) {
             this._mc = mc;
             this._um = um;
+            this._logger = logger;
         }
 
         public async Task<bool> CheckClientIdExists(string clientid) {
             if (String.IsNullOrWhiteSpace(clientid)) {
+                _logger.LogError("no client id was supplied");
                 return false;
             }
             // Check exists in DB...
