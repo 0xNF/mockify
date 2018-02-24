@@ -232,7 +232,11 @@ namespace Mockify.Migrations
 
                     b.Property<string>("ClientSecret");
 
+                    b.Property<string>("TokenId");
+
                     b.HasKey("ClientId");
+
+                    b.HasIndex("TokenId");
 
                     b.ToTable("Applications");
                 });
@@ -247,6 +251,8 @@ namespace Mockify.Migrations
                     b.Property<string>("ApplicationUserId1");
 
                     b.Property<string>("ClientId");
+
+                    b.Property<DateTime>("ExpiresAt");
 
                     b.Property<string>("TokenType");
 
@@ -363,6 +369,13 @@ namespace Mockify.Migrations
                     b.HasOne("Mockify.Models.RegisteredApplication", "RegisteredApplication")
                         .WithMany("RedirectURIs")
                         .HasForeignKey("RegisteredApplicationId");
+                });
+
+            modelBuilder.Entity("Mockify.Models.RegisteredApplication", b =>
+                {
+                    b.HasOne("Mockify.Models.UserApplicationToken", "ClientCredentialToken")
+                        .WithMany()
+                        .HasForeignKey("TokenId");
                 });
 
             modelBuilder.Entity("Mockify.Models.UserApplicationToken", b =>

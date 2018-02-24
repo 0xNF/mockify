@@ -283,13 +283,14 @@ namespace Mockify {
             // For example, openid and offline access should not be returned to the user
             // Furthermore, the internal scope of Public, which is implied by all token requests, should not be displayed to the user.
             List<string> stripped_scopes = new List<string>();
-            foreach (string scope in response.Scope.Split(' ')) {
-                if (SpotifyScope.IdMap.ContainsKey(scope) && scope != SpotifyScope.Public.Name) {
-                    stripped_scopes.Add(scope);
+            if (!String.IsNullOrWhiteSpace(response.Scope)) {
+                foreach (string scope in response.Scope.Split(' ')) {
+                    if (SpotifyScope.IdMap.ContainsKey(scope) && scope != SpotifyScope.Public.Name) {
+                        stripped_scopes.Add(scope);
+                    }
                 }
+                response.Scope = String.Join(' ', stripped_scopes);
             }
-            response.Scope = String.Join(' ', stripped_scopes);
-
             response.RemoveParameter("resource");
             response.RemoveParameter("id_token");
         }
@@ -309,6 +310,7 @@ namespace Mockify {
             if (!String.IsNullOrWhiteSpace(context.Response.AccessToken)) {
                 var at = context.Response.AccessToken;
                 var rt = context.Response.RefreshToken;
+                var ei = context.Response.ExpiresIn ?? 0;
 
                 var authResult = await context.HttpContext.AuthenticateAsync(OpenIdConnectServerDefaults.AuthenticationScheme);
                 string clientid = authResult.Principal.Claims.Where(x => x.Type == "client_id").First().Value;
@@ -321,7 +323,7 @@ namespace Mockify {
                 foreach (UserApplicationToken old in au.UserApplicationTokens.Where(x => x.ClientId == clientid)) {
                     au.UserApplicationTokens.Remove(old);
                 }
-                au.UserApplicationTokens.Add(new UserApplicationToken() { ClientId = clientid, TokenType = "access_token", TokenValue = at });
+                au.UserApplicationTokens.Add(new UserApplicationToken() { ClientId = clientid, TokenType = "access_token", TokenValue = at, ExpiresAt = DateTime.UtcNow.AddSeconds(ei) });
                 au.UserApplicationTokens.Add(new UserApplicationToken() { ClientId = clientid, TokenType = "refresh_token", TokenValue = rt });
 
                 await DatabaseContext.SaveChangesAsync();
@@ -352,6 +354,7 @@ namespace Mockify {
         private async Task _applyImplicitToken(ApplyTokenResponseContext context) {
             if (!String.IsNullOrWhiteSpace(context.Response.AccessToken)) {
                 var at = context.Response.AccessToken;
+                var ei = context.Response.ExpiresIn ?? 0;
 
                 var authResult = await context.HttpContext.AuthenticateAsync(OpenIdConnectServerDefaults.AuthenticationScheme);
                 string clientid = authResult.Principal.Claims.Where(x => x.Type == "client_id").First().Value;
@@ -365,14 +368,32 @@ namespace Mockify {
                 foreach (UserApplicationToken old in au.UserApplicationTokens.Where(x => x.ClientId == clientid)) {
                     au.UserApplicationTokens.Remove(old);
                 }
-                au.UserApplicationTokens.Add(new UserApplicationToken() { ClientId = clientid, TokenType = "access_token", TokenValue = at });
+                au.UserApplicationTokens.Add(new UserApplicationToken() { ClientId = clientid, TokenType = "access_token", TokenValue = at, ExpiresAt = DateTime.UtcNow.AddSeconds(ei)});
 
                 await DatabaseContext.SaveChangesAsync();
                 _stripUnnecessaryResponseParameters(context);
             }
         }
         private async Task _applyClientCredentialsToken(ApplyTokenResponseContext context) {
+            if (!String.IsNullOrWhiteSpace(context.Response.AccessToken)) {
+                var at = context.Response.AccessToken;
+                string clientid = context.Request.ClientId;
+                var ei = context.Response.ExpiresIn ?? 0;
 
+                // Write this Client Access Token to the database, replacing any old one that may be in use.
+                MockifyDbContext DatabaseContext = context.HttpContext.RequestServices.GetRequiredService<MockifyDbContext>();
+                RegisteredApplication ra = await DatabaseContext.Applications.Include(x => x.ClientCredentialToken).FirstOrDefaultAsync(x => x.ClientId == clientid);
+                if(ra == null) {
+                    // ??
+                    return;
+                }
+                else {
+                    ra.ClientCredentialToken = new UserApplicationToken() { ClientId = clientid, TokenType = "client_credential", TokenValue = at, ExpiresAt = DateTime.UtcNow.AddSeconds(ei) };
+                    await DatabaseContext.SaveChangesAsync();
+                    _stripUnnecessaryResponseParameters(context);
+                }
+
+            }
         }
         public override async Task ApplyTokenResponse(ApplyTokenResponseContext context) {
             if (context.Request.IsRefreshTokenGrantType()) {
