@@ -28,6 +28,9 @@ namespace Mockify {
             if (context.Options.AuthorizationEndpointPath.HasValue &&
                 context.Request.Path.Value.StartsWith(context.Options.AuthorizationEndpointPath)) {
                 context.MatchAuthorizationEndpoint();
+            } else if (context.Options.RevocationEndpointPath.HasValue &&
+                context.Request.Path.Value.StartsWith(context.Options.RevocationEndpointPath)) {
+                context.MatchRevocationEndpoint();
             }
             return Task.CompletedTask;
         }
@@ -212,6 +215,12 @@ namespace Mockify {
             await _validateAuthorizationCodeFlow(context);
 
             return;
+        }
+
+        public override async Task ValidateRevocationRequest(ValidateRevocationRequestContext context) {
+            
+            // TODO
+            base.ValidateRevocationRequest(context);
         }
         #endregion
 
