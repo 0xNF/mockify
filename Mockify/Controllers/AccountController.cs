@@ -79,8 +79,10 @@ namespace Mockify.Controllers {
         public async Task<IActionResult> Revoke(string client_id) {
             string userid = _userManager.GetUserId(HttpContext.User);
             ApplicationUser au = await _mc.ApplicationUser.Include(x => x.UserApplicationTokens).Where(x => x.Id == userid).FirstOrDefaultAsync();
-            UserApplicationToken uat = au.UserApplicationTokens.Find(x => x.ClientId == client_id);
-            au.UserApplicationTokens.Remove(uat);
+            List<UserApplicationToken> uats = au.UserApplicationTokens.Where(x => x.ClientId == client_id).ToList();
+            foreach (UserApplicationToken uat in uats) {
+                au.UserApplicationTokens.Remove(uat);
+            }
             await _mc.SaveChangesAsync();
             return RedirectToLocal("/us/account/apps");
         }
