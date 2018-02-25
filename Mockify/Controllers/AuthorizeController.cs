@@ -24,6 +24,7 @@ using Newtonsoft.Json.Linq;
 namespace Mockify.Controllers {
 
     [Authorize]
+    [Area("account")]
     [Route("/authorize/")]
     public class AuthorizeController : Controller {
 

@@ -14,6 +14,10 @@ using Mockify.Data;
 using Mockify.Models;
 using Mockify.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Mockify.Models.Spotify;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Linq;
 
 namespace Mockify {
     public partial class Startup
@@ -28,12 +32,15 @@ namespace Mockify {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<AreaRouter>();
+
             services.AddDbContext<MockifyDbContext>(options =>
                 //options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
                 options.UseSqlite("Data Source=Mockify.db")
             );
 
-            services.AddIdentity<ApplicationUser, IdentityRole>((x) => {
+
+            services.AddIdentity<ApplicationUser, IdentityRole>((IdentityOptions x) => {
                 x.Password.RequireNonAlphanumeric = false;
                 x.Password.RequiredLength = 6;
                 x.Password.RequireDigit = false;
@@ -43,24 +50,33 @@ namespace Mockify {
                 .AddEntityFrameworkStores<MockifyDbContext>()
                 .AddDefaultTokenProviders();
 
+            //// This is the problem area - The Identity cookie won't apply unless it matches with 'localhost' - even '.localhost' is not right
+            //services.ConfigureApplicationCookie(x => {
+            //    x.Cookie.SecurePolicy = CookieSecurePolicy.None;
+            //    x.Cookie.Domain = "localhost";
+            //});
+
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IValidateAuthorizationService, ValidationAuthorizationService>();
             services.AddTransient<IRateLimitService, RateLimitService>();
 
 
-            services.AddAuthentication().AddOpenIdConnectServer(options => {
-                options.Provider = new MockifyAuthorizationProvider();
-                options.TokenEndpointPath = "/api/token";
-                options.AuthorizationEndpointPath = "/authorize/";
-                options.UseSlidingExpiration = false; // Spotify does not issue new refresh tokens
+            services.AddAuthentication()
+                .AddOpenIdConnectServer(options => {
+                    options.Provider = new MockifyAuthorizationProvider();
+                    options.TokenEndpointPath = "/api/token";
+                    options.AuthorizationEndpointPath = "/authorize/";
+                    options.UseSlidingExpiration = false; // Spotify does not issue new refresh tokens
             });
+
 
             services.AddMvc();
         }
 
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory logger, AreaRouter areaRouter)
         {
             if (env.IsDevelopment())
             {
@@ -79,6 +95,8 @@ namespace Mockify {
 
             app.UseMvc(routes =>
             {
+                routes.DefaultHandler = areaRouter;
+                routes.MapRoute("areaRoute", "{area:exists}/{controller=Admin}/{action=Index}/{id?}");
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");

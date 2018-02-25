@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 
 namespace Mockify.Models.Spotify {
+
+
     public class Country {
         public string ISO_ALPHA_2;
         public string FormalName;

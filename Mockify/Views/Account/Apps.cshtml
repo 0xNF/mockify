@@ -56,7 +56,10 @@
                         @ra.ApplicationDescription
                     </div>
                     <div class="apps-revoke">
-                        <form method="post" action="/us/account/apps/revoke/@ra.ClientId">
+                        <form 
+                              asp-antiforgery="true"
+                              method="post" action="/us/account/apps/revoke/@ra.ClientId"
+                              >
                             <button class="btn btn-link btn-sm" type="submit">Revoke Access</button>
                         </form>
                     </div>

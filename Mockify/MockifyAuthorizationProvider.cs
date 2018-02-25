@@ -26,6 +26,7 @@ namespace Mockify {
             // AuthorizationEndpointPath. This handler uses a more relaxed policy that allows extracting
             // authorization requests received at /connect/authorize/accept and /connect/authorize/deny.
             if (context.Options.AuthorizationEndpointPath.HasValue &&
+                context.Request.Host.Value.StartsWith(SpotifyConstants.AccountHost) &&
                 context.Request.Path.Value.StartsWith(context.Options.AuthorizationEndpointPath)) {
                 context.MatchAuthorizationEndpoint();
             } else if (context.Options.RevocationEndpointPath.HasValue &&

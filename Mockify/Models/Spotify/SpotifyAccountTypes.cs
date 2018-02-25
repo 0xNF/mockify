@@ -25,7 +25,10 @@ namespace Mockify.Models.Spotify {
 
     }
 
-    public class SpotifyConstants {
-        
+    public static class SpotifyConstants {
+        public const int port = 44345;
+        public const string host = "localhost";
+        public const string ApiHost = "api";
+        public const string AccountHost = "accounts";
     }
 }
