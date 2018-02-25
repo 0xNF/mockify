@@ -71,6 +71,7 @@ namespace Mockify.Models {
                 }
                 return $"{local}@{domain}.{route}";
             }
+
             return new ApplicationUser() {
                 Birthdate = randomBday(),
                 Country = Spotify.Country.SpotifyMarkets[r.Next(0, Spotify.Country.SpotifyMarkets.Count)].FormalName,

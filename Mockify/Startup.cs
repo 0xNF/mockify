@@ -18,8 +18,12 @@ using Microsoft.Extensions.Logging;
 using Mockify.Models.Spotify;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
+using Mockify.AuthorizationHelpers;
 
 namespace Mockify {
+
     public partial class Startup
     {
         public Startup(IConfiguration configuration)
@@ -47,20 +51,14 @@ namespace Mockify {
                 x.Password.RequireLowercase = false;
                 x.Password.RequireUppercase = false;
             })
-                .AddEntityFrameworkStores<MockifyDbContext>()
-                .AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<MockifyDbContext>()
+            .AddDefaultTokenProviders();
 
-            //// This is the problem area - The Identity cookie won't apply unless it matches with 'localhost' - even '.localhost' is not right
-            //services.ConfigureApplicationCookie(x => {
-            //    x.Cookie.SecurePolicy = CookieSecurePolicy.None;
-            //    x.Cookie.Domain = "localhost";
-            //});
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IValidateAuthorizationService, ValidationAuthorizationService>();
             services.AddTransient<IRateLimitService, RateLimitService>();
-
 
             services.AddAuthentication()
                 .AddOpenIdConnectServer(options => {
@@ -76,7 +74,7 @@ namespace Mockify {
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory logger, AreaRouter areaRouter)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -95,8 +93,8 @@ namespace Mockify {
 
             app.UseMvc(routes =>
             {
-                routes.DefaultHandler = areaRouter;
-                routes.MapRoute("areaRoute", "{area:exists}/{controller=Admin}/{action=Index}/{id?}");
+                //routes.DefaultHandler = areaRouter;
+                //routes.MapRoute("areaRoute", "{area:exists}/{controller=Admin}/{action=Index}/{id?}");
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
