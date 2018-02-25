@@ -329,7 +329,7 @@ namespace Mockify {
                 // Replace the old Tokens with the new ones
                 MockifyDbContext DatabaseContext = context.HttpContext.RequestServices.GetRequiredService<MockifyDbContext>();
                 ApplicationUser au = await DatabaseContext.ApplicationUser.Include(x => x.UserApplicationTokens).Where(x => x.Id == userid).FirstOrDefaultAsync();
-                foreach (UserApplicationToken old in au.UserApplicationTokens.Where(x => x.ClientId == clientid)) {
+                foreach (UserApplicationToken old in au.UserApplicationTokens.Where(x => x.ClientId == clientid).ToList()) {
                     au.UserApplicationTokens.Remove(old);
                 }
                 au.UserApplicationTokens.Add(new UserApplicationToken() { ClientId = clientid, TokenType = "access_token", TokenValue = at, ExpiresAt = DateTime.UtcNow.AddSeconds(ei) });
