@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.Validation" Version="2.0.0-rc1-final" />
+    <PackageReference Include="AspNet.Security.OpenIdConnect.Extensions" Version="2.0.0-rc2-final" />
+    <PackageReference Include="AspNet.Security.OpenIdConnect.Primitives" Version="2.0.0-rc2-final" />
+    <PackageReference Include="AspNet.Security.OpenIdConnect.Server" Version="2.0.0-rc2-final" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.1" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" PrivateAssets="All" />
@@ -20,14 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Migrations\" />
     <Folder Include="Migrations\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\libraries\AspNet.Security.OpenIdConnect.Server\src\AspNet.Security.OpenIdConnect.Extensions\AspNet.Security.OpenIdConnect.Extensions.csproj" />
-    <ProjectReference Include="..\..\libraries\AspNet.Security.OpenIdConnect.Server\src\AspNet.Security.OpenIdConnect.Primitives\AspNet.Security.OpenIdConnect.Primitives.csproj" />
-    <ProjectReference Include="..\..\libraries\AspNet.Security.OpenIdConnect.Server\src\AspNet.Security.OpenIdConnect.Server\AspNet.Security.OpenIdConnect.Server.csproj" />
   </ItemGroup>
 
 </Project>

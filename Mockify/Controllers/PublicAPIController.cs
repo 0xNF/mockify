@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ using Mockify.Models;
 
 namespace Mockify.Controllers {
 
+    [AllowAnonymous]
     [Route("/v1/")]
     public class PublicAPIController : Controller {
 
@@ -19,6 +21,7 @@ namespace Mockify.Controllers {
 
         private MockifyDbContext _mc;
         private ILogger<PublicAPIController> _logger;
+        private ServerSettings _serverSettings;
 
         public static List<Endpoint> Endpoints = new List<Endpoint>() {
             //new Endpoint("")
@@ -28,10 +31,11 @@ namespace Mockify.Controllers {
         public PublicAPIController(MockifyDbContext mc, ILogger<PublicAPIController> logger) {
             this._mc = mc;
             this._logger = logger;
+            this._serverSettings = _mc.ServerSettings.Include(x =>  x.RateLimits).Include(x=>x.Endpoints).First();
         }
 
         
-        private class ErrorOrNot {
+        public class ErrorOrNot {
             public IActionResult ErrResult;
             public bool Success;
 
@@ -55,8 +59,8 @@ namespace Mockify.Controllers {
             ErrorObject eo = new ErrorObject(status, message);
             return Json(eo.ToJson());
         }
-        public IActionResult SendRateLimit(TimeSpan RetryAffter) {
-            Response.Headers.Add("Retry-After", RetryAffter.TotalSeconds.ToString());
+        public IActionResult SendRateLimit(RateLimits rl) {
+            Response.Headers.Add("Retry-After", rl.RetryAfter.ToString());
             return SendError(429, "API rate limit exceeded");
         }
 
@@ -71,7 +75,7 @@ namespace Mockify.Controllers {
                     return new ErrorOrNot(SendError(400, "Only valid bearer authentication supported"));
                 }
                 string access = splits[1];
-                ApplicationUser au = await _mc.Users.Include(x => x.UserApplicationTokens).Where(x => x.UserApplicationTokens.Any(y => y.TokenValue == access)).FirstOrDefaultAsync();
+                ApplicationUser au = await _mc.Users.Include(x => x.UserApplicationTokens).Include(x => x.OverallRateLimit).Where(x => x.UserApplicationTokens.Any(y => y.TokenValue == access)).FirstOrDefaultAsync();
                 if(au == null) {
                     return new ErrorOrNot(SendError(401, "Invalid access token"));
                 }
@@ -79,23 +83,44 @@ namespace Mockify.Controllers {
                 if(uat == null) {
                     return new ErrorOrNot(SendError(401, "Invalid access token"));
                 }
-                if(uat.ExpiresAt <= DateTime.UtcNow) {
-                    return new ErrorOrNot(SendError(401, "Access token expired"));
+                if(uat.IsExpired) {
+                    return new ErrorOrNot(SendError(401, "The access token expired"));
                 }
 
-                RegisteredApplication ra = await _mc.Applications.Where(x => x.ClientId == uat.ClientId).FirstOrDefaultAsync();
+                RegisteredApplication ra = await _mc.Applications.Include(x => x.OverallRateLimit).Where(x => x.ClientId == uat.ClientId).FirstOrDefaultAsync();
                 if (ra == null) {
                     return new ErrorOrNot(SendError(404, "Application does not exist")); // TODO figure out what error Spotify sends when using a no longer valid client-id token
                 }
 
-                // TODO check that User is within their Overall Rate Limit
-                // TODO check that User is within App Rate Limit
-                // TODO check that App is within its Rate Limit
-                    // All of these return SendRateLimit(retry-after...)// TODO determine the Retry-After amount
-                
-                //Finally, if successful, increment api call count (for user in all of Mockify, for user in application, for application)
+                /* Check that Server isn't in Rate Limit Mode */
+                if(_serverSettings.RateLimits.IsRateLimited) {
+                    return new ErrorOrNot(SendRateLimit(_serverSettings.RateLimits));
+                }
+                // TODO check that Endpoint isn't in Rate Limit Mode
+
+                /* Check that Application isn't in Rate Limit Mode */
+                if(ra.OverallRateLimit.IsRateLimited) {
+                    return new ErrorOrNot(SendRateLimit(ra.OverallRateLimit));
+                }
+
+                /* Check that User isn't in Rate Limit Mode */
+                if(au.OverallRateLimit.IsRateLimited) {
+                    return new ErrorOrNot(SendRateLimit(au.OverallRateLimit));
+                }
+                // TODO check that user is within App Rate Limit
+                if(uat.AppUserRateLimits.IsRateLimited) {
+                    return new ErrorOrNot(SendRateLimit(uat.AppUserRateLimits));
+                }
+                /* Finally, if successful, increment api call count */
+                _serverSettings.RateLimits.CurrentCalls += 1;
+                // TODO increment Endpoint rate limit
+                ra.OverallRateLimit.CurrentCalls += 1;
+                au.OverallRateLimit.CurrentCalls += 1;
+                uat.AppUserRateLimits.CurrentCalls += 1;
+                _mc.SaveChangesAsync(); // No need to await.
+                return new ErrorOrNot(); // Success
             }
-            return new ErrorOrNot();
+            return new ErrorOrNot(SendError(401, "No token provided"));
         }
 
 

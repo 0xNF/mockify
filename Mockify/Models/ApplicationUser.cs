@@ -13,22 +13,13 @@ namespace Mockify.Models {
 
         public string Birthdate { get; set; }
         public string Country { get; set; }
-
         public string Product { get; set; }
-
         [StringLength(32, MinimumLength = 0)]
         public string DisplayName { get; set; }
-
-        public List<UserApplicationToken> UsersApplications { get; set; } = new List<UserApplicationToken>();
         public List<ExternalUrl> Externalurls { get; set; } = new List<ExternalUrl>();
-
-
         public int Followers { get; set; } = 0;
 
-        /// <summary>
-        /// The Rate Limits for the user, including whether they are limited, when they can make calls again, and the tally of their calls vs max allowed per window.
-        /// </summary>
-        RateLimits RateLimits { get; set; }
+        public RateLimits OverallRateLimit { get; set; } // The User's Rate Limits independent of their limits within any given App
 
         public List<UserApplicationToken> UserApplicationTokens { get; set; } = new List<UserApplicationToken>();
 
@@ -46,9 +37,9 @@ namespace Mockify.Models {
 
         public static ApplicationUser Randomize() {
             string randomBday() {
-                string month = "" + r.Next(1, 13);
-                string day = "" + r.Next(1, 29);
-                string year = "" + r.Next(1900, 2018);
+                string month = "" + r.Next(1, 13); // [)
+                string day = "" + r.Next(1, 29); // [)
+                string year = "" + r.Next(1900, DateTime.UtcNow.Year); // [)
                 return $"{(month.Length == 1 ? "0" + month : month)}/{(day.Length == 1 ? "0"+day : day)}/{year}"; // MM/d/yyyy
             }
             string randomName() {
@@ -95,6 +86,14 @@ namespace Mockify.Models {
         public string TokenValue { get; set; }
 
         public DateTime ExpiresAt { get; set; }
+
+        public RateLimits AppUserRateLimits { get; set; }
+
+        public bool IsExpired {
+            get {
+                return (DateTime.UtcNow >= ExpiresAt);
+            }
+        }
     }
 
 }

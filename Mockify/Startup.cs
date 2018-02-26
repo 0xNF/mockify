@@ -14,6 +14,7 @@ using Mockify.Data;
 using Mockify.Models;
 using Mockify.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Hosting;
 
 namespace Mockify {
     public partial class Startup
@@ -47,6 +48,9 @@ namespace Mockify {
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IValidateAuthorizationService, ValidationAuthorizationService>();
             services.AddTransient<IRateLimitService, RateLimitService>();
+            services.AddTransient<IRateLimitsGetter, RateLimitsGetter>();
+            services.AddScoped<IHostedService, RateLimitResetService>();
+
 
 
             services.AddAuthentication().AddOpenIdConnectServer(options => {

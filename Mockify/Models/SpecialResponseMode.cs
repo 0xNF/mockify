@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Mockify.Models {
     /// <summary>
@@ -6,16 +7,18 @@ namespace Mockify.Models {
     /// OK, Bad Gateway, etc
     /// </summary>
     public class SpecialResponseMode {
-        int id;
-        string name;
+
+        [Key]
+        public int SpecialResponseModeId { get; set; }
+        public string Name { get; set; }
 
         Dictionary<int, SpecialResponseMode> SpecialResponseModemap = new Dictionary<int, SpecialResponseMode>();
 
         Dictionary<SpecialResponseMode, int> SpecialResponseModeIdMap = new Dictionary<SpecialResponseMode, int>();
 
         private SpecialResponseMode(int id, string name) {
-            this.id = id;
-            this.name = name;
+            this.SpecialResponseModeId = id;
+            this.Name = name;
             SpecialResponseModemap.Add(id, this);
             SpecialResponseModeIdMap.Add(this, id);
         }

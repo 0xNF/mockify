@@ -40,7 +40,6 @@ namespace Mockify.Controllers {
         }
 
         [AllowAnonymous]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(CancellationToken cancellationToken) {
             OpenIdConnectRequest request = HttpContext.GetOpenIdConnectRequest();
             RegisteredApplication ra = await (from entity in _mockifyContext.Applications
@@ -53,7 +52,7 @@ namespace Mockify.Controllers {
                        "application cannot be found in the database"
                 });
             }
-            // Regular view
+            /* Regular view */
             List<SpotifyScope> sscopes = new List<SpotifyScope>() { SpotifyScope.Public };
             if (!string.IsNullOrWhiteSpace(request.Scope)) {
                 foreach (string split in request.Scope.Split(',')) {
@@ -61,7 +60,7 @@ namespace Mockify.Controllers {
                         var scope = SpotifyScope.IdMap[split];
                         if(!sscopes.Contains(scope)) {
                             sscopes.Add(SpotifyScope.IdMap[split]);
-                            // no dupes
+                            /* no dupes */
                         }
                     }
                 }
@@ -149,7 +148,7 @@ namespace Mockify.Controllers {
         [HttpPost("deny")]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Deny(CancellationToken cancellationToken) {
+        public IActionResult Deny(CancellationToken cancellationToken) {
             return Forbid(OpenIdConnectServerDefaults.AuthenticationScheme);
         }
 

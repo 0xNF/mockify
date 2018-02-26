@@ -148,6 +148,7 @@ namespace Mockify {
             } else if (!await authservice.CheckTokenNotRevoked(gtype.Value, context.Request.RefreshToken)) {
                 context.Reject(OpenIdConnectConstants.Errors.AccessDenied, "The supplied token has been revoked. Please re-authenticate.");
             }
+            //TODO come back to this - rls is no longer our preferred service. _mc.RateLimits should be our goto
             else if (!(await rls.UserWithinRateLimit(userid.Value)) && !(await rls.UserWithinAppRateLimit(context.ClientId, userid.Value, gtype.Value))) {
                 context.Reject(RateLimits.RateLimitExceededError, RateLimits.RateLimitExceededErrorDescription);
                 return;

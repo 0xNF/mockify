@@ -16,6 +16,8 @@ namespace Mockify.Data
         {
         }
 
+        public DbSet<RateLimits> RateLimits { get; set; }
+        public DbSet<ServerSettings> ServerSettings { get; set; }
         public DbSet<RegisteredApplication> Applications { get; set; }
 
         public async Task<RegisteredApplication> CreateRegisteredApplication(string appname, string appdescription) {

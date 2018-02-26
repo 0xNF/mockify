@@ -18,6 +18,7 @@ namespace Mockify.Models {
         public string ClientSecret { get; set; }
         public List<RedirectURI> RedirectURIs { get; set; } = new List<RedirectURI>();
         public List<UserApplicationToken> UserApplicationTokens { get; set; } = new List<UserApplicationToken>();
+        public RateLimits OverallRateLimit { get; set; } = new RateLimits();
 
         [ForeignKey("TokenId")]
         public UserApplicationToken ClientCredentialToken { get; set; }
