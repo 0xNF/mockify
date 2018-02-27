@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Mockify.Data;
 using Mockify.Models;
 using System;
@@ -9,32 +11,16 @@ using System.Threading.Tasks;
 
 namespace Mockify.Services {
 
-    public interface IRateLimitsGetter {
-        IQueryable<RateLimits> ExpiredLimits { get; }
-        Task Save();
-    }
-    public class RateLimitsGetter : IRateLimitsGetter {
-        MockifyDbContext _mc;
-
-        public IQueryable<RateLimits> ExpiredLimits { get; }
-
-        public RateLimitsGetter(MockifyDbContext mc) {
-            _mc = mc;
-            ExpiredLimits = _mc.RateLimits.Where(x => (x.WindowStartTime + x.RateWindow) <= DateTime.UtcNow);
-        }
-
-        public async Task Save() {
-            await _mc.SaveChangesAsync();
-        }
-    }
-
     public class RateLimitResetService : HostedService {
 
+        private readonly IServiceScopeFactory scopeFactory;
         private static TimeSpan ts = TimeSpan.FromMinutes(1);
         private ILogger<RateLimitResetService> _logger;
-        private readonly IRateLimitsGetter _getter;
 
-        public RateLimitResetService(ILogger<RateLimitResetService> logger) {
+        public RateLimitResetService(
+            IServiceScopeFactory scopeFactory,
+            ILogger<RateLimitResetService> logger) {
+            this.scopeFactory = scopeFactory;
             this._logger = logger;
         }
 
@@ -42,13 +28,20 @@ namespace Mockify.Services {
 
             while (!cancellationToken.IsCancellationRequested) {
                 try {
-                    /* All Expired Rate Limits */
-                    foreach(RateLimits rl in _getter.ExpiredLimits) {
-                        rl.CurrentCalls = 0;
+                    using (IServiceScope scope = scopeFactory.CreateScope()) {
+                        MockifyDbContext mc = scope.ServiceProvider.GetRequiredService<MockifyDbContext>();
+                        IQueryable<RateLimits> ExpiredLimits = mc.RateLimits.Where(x => (x.WindowStartTime + x.RateWindow) <= DateTime.UtcNow);
+                        if(ExpiredLimits.Any()) {
+                            /* All Expired Rate Limits */
+                            foreach (RateLimits rl in ExpiredLimits) {
+                                rl.CurrentCalls = 0;
+                            }
+                            await mc.SaveChangesAsync();
+                        }
                     }
-                    await _getter.Save();
                 }
                 catch (Exception e) {
+                    _logger.LogError("Failed to clear rate limits", e);
                 }
                 await Task.Delay(ts, cancellationToken);
             }

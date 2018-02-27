@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Mockify.Models {
@@ -11,23 +12,35 @@ namespace Mockify.Models {
         [Key]
         public int SpecialResponseModeId { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
 
-        Dictionary<int, SpecialResponseMode> SpecialResponseModemap = new Dictionary<int, SpecialResponseMode>();
+        public static Dictionary<int, SpecialResponseMode> SpecialResponseModemap = new Dictionary<int, SpecialResponseMode>();
+        public static Dictionary<SpecialResponseMode, int> SpecialResponseModeIdMap = new Dictionary<SpecialResponseMode, int>();
+        public static List<SpecialResponseMode> SpecialResponseModes = new List<SpecialResponseMode>();
 
-        Dictionary<SpecialResponseMode, int> SpecialResponseModeIdMap = new Dictionary<SpecialResponseMode, int>();
-
-        private SpecialResponseMode(int id, string name) {
+        private SpecialResponseMode(int id, string name, string description) {
             this.SpecialResponseModeId = id;
             this.Name = name;
+            this.Description = description;
             SpecialResponseModemap.Add(id, this);
             SpecialResponseModeIdMap.Add(this, id);
+            SpecialResponseModes.Add(this);
         }
 
-        public static SpecialResponseMode ServiceOK = new SpecialResponseMode(200, "Service OK");
-        public static SpecialResponseMode RequestTimeout = new SpecialResponseMode(408, "Request Timeout");
-        public static SpecialResponseMode InternalServerError = new SpecialResponseMode(500, "Internal Server Error");
-        public static SpecialResponseMode ServiceUnavailable = new SpecialResponseMode(503, "Service Unavailable");
-        public static SpecialResponseMode BadGateway = new SpecialResponseMode(502, "Bad Gateway");
+        public JObject ToJson() {
+            Dictionary<string, JToken> keys = new Dictionary<string, JToken>() {
+                { "Type", "SpecialResponseMode" },
+                { nameof(SpecialResponseModeId), SpecialResponseModeId },
+                { nameof(Name), Name },
+                { nameof(Description), Description }
+            };
+            return JObject.FromObject(keys);
+        }
+        public static SpecialResponseMode ServiceOK = new SpecialResponseMode(200, "Service OK", "The server will handle all requests normally");
+        public static SpecialResponseMode RequestTimeout = new SpecialResponseMode(408, "Request Timeout", "The server will respond to all API and Token requests as though it was timing out. Requests will never finish and nothing will be returned to the client.");
+        public static SpecialResponseMode InternalServerError = new SpecialResponseMode(500, "Internal Server Error", "The server will respond to all API and Token requests with Error 500.");
+        public static SpecialResponseMode ServiceUnavailable = new SpecialResponseMode(503, "Service Unavailable", "The server will respond to all API and Token requests with Error 503.");
+        public static SpecialResponseMode BadGateway = new SpecialResponseMode(502, "Bad Gateway", "The server will respond to all API and Token requests with Error 502");
 
     }
 

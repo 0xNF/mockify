@@ -31,7 +31,20 @@ namespace Mockify.Controllers {
         public PublicAPIController(MockifyDbContext mc, ILogger<PublicAPIController> logger) {
             this._mc = mc;
             this._logger = logger;
-            this._serverSettings = _mc.ServerSettings.Include(x =>  x.RateLimits).Include(x=>x.Endpoints).First();
+            if(ServerSettings.Settings == null) {
+                try {
+                    this._serverSettings = _mc.ServerSettings.Include(x => x.RateLimits).Include(x => x.Endpoints).First();
+                    ServerSettings.Settings = this._serverSettings;
+                }
+                catch (InvalidOperationException e) {
+                    //Make a default Server Settings
+                    this._serverSettings = ServerSettings.DEFAULT;
+                    ServerSettings.Settings = this._serverSettings;
+                }
+            }
+            else {
+                this._serverSettings = ServerSettings.Settings;
+            }
         }
 
         
@@ -40,13 +53,8 @@ namespace Mockify.Controllers {
             public bool Success;
 
             public ErrorOrNot(IActionResult res) {
-                if(res == null) {
-                    this.Success = true;
-                    this.ErrResult = null;
-                } else {
-                    this.Success = false;
-                    this.ErrResult = res;
-                }
+                this.ErrResult = res;
+                this.Success = res == null;
             }
 
             public ErrorOrNot() {
@@ -123,6 +131,11 @@ namespace Mockify.Controllers {
             return new ErrorOrNot(SendError(401, "No token provided"));
         }
 
+        [HttpGet("test")]
+        public async Task<IActionResult> Test() {
+           List<RateLimits> lims =  (_mc.RateLimits.Select(x => x)).ToList();
+            return Ok(); ;
+        } 
 
         #region Album Endpoints
         // https://beta.developer.spotify.com/documentation/web-api/reference/albums/get-album/

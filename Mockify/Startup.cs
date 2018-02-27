@@ -48,8 +48,7 @@ namespace Mockify {
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IValidateAuthorizationService, ValidationAuthorizationService>();
             services.AddTransient<IRateLimitService, RateLimitService>();
-            services.AddTransient<IRateLimitsGetter, RateLimitsGetter>();
-            services.AddScoped<IHostedService, RateLimitResetService>();
+            services.AddSingleton<IHostedService, RateLimitResetService>();
 
 
 

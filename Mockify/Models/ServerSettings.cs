@@ -7,6 +7,8 @@ namespace Mockify.Models {
     /// </summary>
     public class ServerSettings {
 
+        public static ServerSettings Settings = null;
+
         [Key]
         public int ServerSettingsId { get; set; }
 
@@ -27,6 +29,12 @@ namespace Mockify.Models {
         /// </summary>
         public List<Endpoint> Endpoints { get; set; }
 
+        public static ServerSettings DEFAULT  = new ServerSettings() {
+            Endpoints = new List<Endpoint>(),
+            ServerSettingsId = 1,
+            ResponseMode = SpecialResponseMode.ServiceOK,
+            RateLimits = RateLimits.DEFAULT
+        };
     }
 
 }
