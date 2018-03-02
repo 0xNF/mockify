@@ -200,7 +200,7 @@ namespace Mockify.Migrations
 
                     b.Property<int?>("RateLimitsId");
 
-                    b.Property<int?>("ResponseModeSpecialResponseModeId");
+                    b.Property<int?>("ResponseModeid");
 
                     b.Property<int?>("ServerSettingsId");
 
@@ -208,7 +208,7 @@ namespace Mockify.Migrations
 
                     b.HasIndex("RateLimitsId");
 
-                    b.HasIndex("ResponseModeSpecialResponseModeId");
+                    b.HasIndex("ResponseModeid");
 
                     b.HasIndex("ServerSettingsId");
 
@@ -300,27 +300,29 @@ namespace Mockify.Migrations
 
                     b.Property<int?>("RateLimitsId");
 
-                    b.Property<int?>("ResponseModeSpecialResponseModeId");
+                    b.Property<int?>("ResponseModeid");
 
                     b.HasKey("ServerSettingsId");
 
                     b.HasIndex("RateLimitsId");
 
-                    b.HasIndex("ResponseModeSpecialResponseModeId");
+                    b.HasIndex("ResponseModeid");
 
                     b.ToTable("ServerSettings");
                 });
 
             modelBuilder.Entity("Mockify.Models.SpecialResponseMode", b =>
                 {
-                    b.Property<int>("SpecialResponseModeId")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Description");
 
                     b.Property<string>("Name");
 
-                    b.HasKey("SpecialResponseModeId");
+                    b.HasKey("id");
 
-                    b.ToTable("SpecialResponseMode");
+                    b.ToTable("ResponseModes");
                 });
 
             modelBuilder.Entity("Mockify.Models.UserApplicationToken", b =>
@@ -454,7 +456,7 @@ namespace Mockify.Migrations
 
                     b.HasOne("Mockify.Models.SpecialResponseMode", "ResponseMode")
                         .WithMany()
-                        .HasForeignKey("ResponseModeSpecialResponseModeId");
+                        .HasForeignKey("ResponseModeid");
 
                     b.HasOne("Mockify.Models.ServerSettings")
                         .WithMany("Endpoints")
@@ -494,7 +496,7 @@ namespace Mockify.Migrations
 
                     b.HasOne("Mockify.Models.SpecialResponseMode", "ResponseMode")
                         .WithMany()
-                        .HasForeignKey("ResponseModeSpecialResponseModeId");
+                        .HasForeignKey("ResponseModeid");
                 });
 
             modelBuilder.Entity("Mockify.Models.UserApplicationToken", b =>

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Mockify.Migrations
 {
-    public partial class WithRateLimitTable : Migration
+    public partial class n3 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -69,16 +69,17 @@ namespace Mockify.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SpecialResponseMode",
+                name: "ResponseModes",
                 columns: table => new
                 {
-                    SpecialResponseModeId = table.Column<int>(nullable: false)
+                    id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    Description = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SpecialResponseMode", x => x.SpecialResponseModeId);
+                    table.PrimaryKey("PK_ResponseModes", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -147,7 +148,7 @@ namespace Mockify.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     DefaultMarket = table.Column<string>(nullable: true),
                     RateLimitsId = table.Column<int>(nullable: true),
-                    ResponseModeSpecialResponseModeId = table.Column<int>(nullable: true)
+                    ResponseModeid = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -159,10 +160,10 @@ namespace Mockify.Migrations
                         principalColumn: "RateLimitsId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ServerSettings_SpecialResponseMode_ResponseModeSpecialResponseModeId",
-                        column: x => x.ResponseModeSpecialResponseModeId,
-                        principalTable: "SpecialResponseMode",
-                        principalColumn: "SpecialResponseModeId",
+                        name: "FK_ServerSettings_ResponseModes_ResponseModeid",
+                        column: x => x.ResponseModeid,
+                        principalTable: "ResponseModes",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -279,7 +280,7 @@ namespace Mockify.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Path = table.Column<string>(nullable: true),
                     RateLimitsId = table.Column<int>(nullable: true),
-                    ResponseModeSpecialResponseModeId = table.Column<int>(nullable: true),
+                    ResponseModeid = table.Column<int>(nullable: true),
                     ServerSettingsId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
@@ -292,10 +293,10 @@ namespace Mockify.Migrations
                         principalColumn: "RateLimitsId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Endpoint_SpecialResponseMode_ResponseModeSpecialResponseModeId",
-                        column: x => x.ResponseModeSpecialResponseModeId,
-                        principalTable: "SpecialResponseMode",
-                        principalColumn: "SpecialResponseModeId",
+                        name: "FK_Endpoint_ResponseModes_ResponseModeid",
+                        column: x => x.ResponseModeid,
+                        principalTable: "ResponseModes",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Endpoint_ServerSettings_ServerSettingsId",
@@ -434,9 +435,9 @@ namespace Mockify.Migrations
                 column: "RateLimitsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Endpoint_ResponseModeSpecialResponseModeId",
+                name: "IX_Endpoint_ResponseModeid",
                 table: "Endpoint",
-                column: "ResponseModeSpecialResponseModeId");
+                column: "ResponseModeid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Endpoint_ServerSettingsId",
@@ -459,9 +460,9 @@ namespace Mockify.Migrations
                 column: "RateLimitsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServerSettings_ResponseModeSpecialResponseModeId",
+                name: "IX_ServerSettings_ResponseModeid",
                 table: "ServerSettings",
-                column: "ResponseModeSpecialResponseModeId");
+                column: "ResponseModeid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserApplicationToken_AppUserRateLimitsRateLimitsId",
@@ -550,7 +551,7 @@ namespace Mockify.Migrations
                 name: "ServerSettings");
 
             migrationBuilder.DropTable(
-                name: "SpecialResponseMode");
+                name: "ResponseModes");
 
             migrationBuilder.DropTable(
                 name: "RateLimits");

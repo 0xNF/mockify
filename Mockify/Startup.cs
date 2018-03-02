@@ -76,6 +76,7 @@ namespace Mockify {
                 app.UseExceptionHandler("/Home/Error");
             }
 
+
             app.UseStaticFiles();
 
             app.UseAuthentication();
@@ -86,6 +87,7 @@ namespace Mockify {
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
         }
 
     }

@@ -7,14 +7,17 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Mockify.Data;
 
 namespace Mockify
 {
+
+
     public class Program
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            BuildWebHost(args).MigrateDatabase().Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>

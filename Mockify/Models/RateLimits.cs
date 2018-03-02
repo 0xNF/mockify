@@ -9,11 +9,16 @@ namespace Mockify.Models {
     /// </summary>
     public class RateLimits {
 
-        [Key]
-        public int RateLimitsId { get; set; }
-
+        public const int MaxRateLimit = 10_000_000;
+        public const int MinRateLimit = 0;
+        public const int MaxTimeWindowMinutes = 10_080;
+        public const int MinTimeWindowMinutes = 0;
         public const string RateLimitExceededError = "Rate Limit Exceeded";
         public const string RateLimitExceededErrorDescription = "You have exceeded your allowed rate limit.";
+
+
+        [Key]
+        public int RateLimitsId { get; set; }
 
         /// <summary>
         /// The number of calls an attached object may make in the specified Rate Window
