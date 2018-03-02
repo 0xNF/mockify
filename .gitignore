@@ -455,3 +455,4 @@ DotNetStandardSpotifyWebApi/.gitignore
 DotNetStandardSpotifyWebApi/DotNetStandardSpotifyWebApi.Tests/
 lyricall/lyricalllog.txt
 *lyricalllog.txt
+Mockify/Mockify.db
