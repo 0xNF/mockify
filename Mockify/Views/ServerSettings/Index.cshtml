@@ -1,0 +1,76 @@
+﻿@using Mockify.Models.Spotify;
+@model Mockify.ViewModels.ServerSettingsViewModel;
+
+@{
+    ViewData["Title"] = "Server Settings";
+}
+
+<h2>Mockify Server Settings</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="savesettings">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ServerSettingsId" />
+            <div class="form-group">
+                <label asp-for="ResponseModeId" class="control-label">Server Response Mode</label>
+                <select required="required" id="InputResponseMode" asp-for="ResponseModeId" class="form-control" onchange="changeResponseDetailsLabel(this)">
+                    @foreach (SpecialResponseMode srm in SpecialResponseMode.SpecialResponseModes) {
+                        <option id="Srm_@srm.id" val="@srm.id">@srm.Name</option>
+                    }
+                </select>
+                <label id="label_ResponseDescription">@Model.ResponseModeDescription</label>
+                <span asp-validation-for="ResponseModeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DefaultMarket" class="control-label">Default Market</label>
+                <select required="required" id="inputDefaultMarket" asp-for="DefaultMarket" class="form-control">
+                        @foreach (Country c in Country.SpotifyMarkets) {
+                        {
+                            <option id="Country_@c.ISO_ALPHA_2" val="@c.ISO_ALPHA_2">@c.FormalName</option>}
+                        }
+                </select>
+                <span asp-validation-for="DefaultMarket" class="text-danger"></span>
+            </div>
+            <div>
+                <label>Server-Wide Rate Limits</label>
+                <p>This the top-level rate limit. Any Endpoint, Application, or individual User rate limits will only take effect if this top-level isn't currently rate-limiting.</p>
+                @*@{Html.RenderPartial("RateLimits", Model.RateLimits); }*@
+                <div class="form-group">
+                    <label asp-for="RateLimits.CallsPerWindow" class="control-label">Calls per Window</label>
+                    <p>How many API calls may be made within a given time-window before the service starts rate-limiting callers.</p>
+                    <input type="number" required="required" id="inputCallsPerWindow" asp-for="RateLimits.CallsPerWindow" class="form-control" />
+                    <span asp-validation-for="RateLimits.CallsPerWindow" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="RateLimits.RateWindowInMinutes" class="control-label">Rate Window</label>
+                    <p>Length of Time in minutes of a given Rate Window. An excess of calls within this time-span will result the caller being rate-limited</p>
+                    <input type="number" required="required" id="inputRateWindow" asp-for="RateLimits.RateWindowInMinutes" class="form-control" />
+                    <span asp-validation-for="RateLimits.RateWindowInMinutes" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script>
+
+    const specialResponseModes = [
+       @Html.Raw(String.Join(",", SpecialResponseMode.SpecialResponseModes.Select(x=>x.ToJson().ToString())))
+    ];
+
+
+    function changeResponseDetailsLabel(e) {
+        console.log(e.value)
+        const item = specialResponseModes.filter(x => x.Name === e.value)[0];
+        console.log(item);
+        $("#label_ResponseDescription").text(item.Description);
+    }
+</script>

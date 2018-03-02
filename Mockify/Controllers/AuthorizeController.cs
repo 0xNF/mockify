@@ -24,38 +24,6 @@ using Newtonsoft.Json.Linq;
 namespace Mockify.Controllers {
 
     [Authorize]
-    [Route("/api/token")]
-    public class TokenController : Controller {
-
-        private readonly ILogger _logger;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly MockifyDbContext _mockifyContext;
-
-        public TokenController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ILogger<AccountController> logger, MockifyDbContext mc) {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _logger = logger;
-            _mockifyContext = mc;
-        }
-
-        [HttpPost("")]
-        public async Task<IActionResult> Index() {
-            ApplicationUser au = await _userManager.GetUserAsync(HttpContext.User);
-            if (au == null) {
-                return View("Error", new AuthorizeErrorViewModel() {
-                    Error = "No such user",
-                    ErrorDescription = "Failed to find specified user"
-                });
-            }
-            OpenIdConnectRequest request = HttpContext.GetOpenIdConnectRequest();
-
-            return Ok();
-        }
-
-    }
-
-    [Authorize]
     [Route("/authorize/")]
     public class AuthorizeController : Controller {
 
@@ -72,7 +40,6 @@ namespace Mockify.Controllers {
         }
 
         [AllowAnonymous]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(CancellationToken cancellationToken) {
             OpenIdConnectRequest request = HttpContext.GetOpenIdConnectRequest();
             RegisteredApplication ra = await (from entity in _mockifyContext.Applications
@@ -85,7 +52,7 @@ namespace Mockify.Controllers {
                        "application cannot be found in the database"
                 });
             }
-            // Regular view
+            /* Regular view */
             List<SpotifyScope> sscopes = new List<SpotifyScope>() { SpotifyScope.Public };
             if (!string.IsNullOrWhiteSpace(request.Scope)) {
                 foreach (string split in request.Scope.Split(',')) {
@@ -93,7 +60,7 @@ namespace Mockify.Controllers {
                         var scope = SpotifyScope.IdMap[split];
                         if(!sscopes.Contains(scope)) {
                             sscopes.Add(SpotifyScope.IdMap[split]);
-                            // no dupes
+                            /* no dupes */
                         }
                     }
                 }
@@ -181,7 +148,7 @@ namespace Mockify.Controllers {
         [HttpPost("deny")]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Deny(CancellationToken cancellationToken) {
+        public IActionResult Deny(CancellationToken cancellationToken) {
             return Forbid(OpenIdConnectServerDefaults.AuthenticationScheme);
         }
 

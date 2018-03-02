@@ -160,6 +160,8 @@ namespace Mockify.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256);
 
+                    b.Property<int?>("OverallRateLimitRateLimitsId");
+
                     b.Property<string>("PasswordHash");
 
                     b.Property<string>("PhoneNumber");
@@ -184,7 +186,33 @@ namespace Mockify.Migrations
                         .IsUnique()
                         .HasName("UserNameIndex");
 
+                    b.HasIndex("OverallRateLimitRateLimitsId");
+
                     b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("Mockify.Models.Endpoint", b =>
+                {
+                    b.Property<int>("EndpointId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Path");
+
+                    b.Property<int?>("RateLimitsId");
+
+                    b.Property<int?>("ResponseModeid");
+
+                    b.Property<int?>("ServerSettingsId");
+
+                    b.HasKey("EndpointId");
+
+                    b.HasIndex("RateLimitsId");
+
+                    b.HasIndex("ResponseModeid");
+
+                    b.HasIndex("ServerSettingsId");
+
+                    b.ToTable("Endpoint");
                 });
 
             modelBuilder.Entity("Mockify.Models.ExternalUrl", b =>
@@ -203,6 +231,24 @@ namespace Mockify.Migrations
                     b.HasIndex("ApplicationUserId");
 
                     b.ToTable("ExternalUrl");
+                });
+
+            modelBuilder.Entity("Mockify.Models.RateLimits", b =>
+                {
+                    b.Property<int>("RateLimitsId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CallsPerWindow");
+
+                    b.Property<int>("CurrentCalls");
+
+                    b.Property<TimeSpan>("RateWindow");
+
+                    b.Property<DateTime>("WindowStartTime");
+
+                    b.HasKey("RateLimitsId");
+
+                    b.ToTable("RateLimits");
                 });
 
             modelBuilder.Entity("Mockify.Models.RedirectURI", b =>
@@ -232,31 +278,75 @@ namespace Mockify.Migrations
 
                     b.Property<string>("ClientSecret");
 
+                    b.Property<int?>("OverallRateLimitRateLimitsId");
+
+                    b.Property<string>("TokenId");
+
                     b.HasKey("ClientId");
+
+                    b.HasIndex("OverallRateLimitRateLimitsId");
+
+                    b.HasIndex("TokenId");
 
                     b.ToTable("Applications");
                 });
 
+            modelBuilder.Entity("Mockify.Models.ServerSettings", b =>
+                {
+                    b.Property<int>("ServerSettingsId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("DefaultMarket");
+
+                    b.Property<int?>("RateLimitsId");
+
+                    b.Property<int?>("ResponseModeid");
+
+                    b.HasKey("ServerSettingsId");
+
+                    b.HasIndex("RateLimitsId");
+
+                    b.HasIndex("ResponseModeid");
+
+                    b.ToTable("ServerSettings");
+                });
+
+            modelBuilder.Entity("Mockify.Models.SpecialResponseMode", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("id");
+
+                    b.ToTable("ResponseModes");
+                });
+
             modelBuilder.Entity("Mockify.Models.UserApplicationToken", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("TokenId")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("AppUserRateLimitsRateLimitsId");
 
                     b.Property<string>("ApplicationUserId");
 
-                    b.Property<string>("ApplicationUserId1");
-
                     b.Property<string>("ClientId");
 
-                    b.Property<string>("OauthToken");
+                    b.Property<DateTime>("ExpiresAt");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("TokenType");
 
-                    b.HasKey("Id");
+                    b.Property<string>("TokenValue");
+
+                    b.HasKey("TokenId");
+
+                    b.HasIndex("AppUserRateLimitsRateLimitsId");
 
                     b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("ApplicationUserId1");
 
                     b.HasIndex("ClientId");
 
@@ -351,6 +441,28 @@ namespace Mockify.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("Mockify.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("Mockify.Models.RateLimits", "OverallRateLimit")
+                        .WithMany()
+                        .HasForeignKey("OverallRateLimitRateLimitsId");
+                });
+
+            modelBuilder.Entity("Mockify.Models.Endpoint", b =>
+                {
+                    b.HasOne("Mockify.Models.RateLimits", "RateLimits")
+                        .WithMany()
+                        .HasForeignKey("RateLimitsId");
+
+                    b.HasOne("Mockify.Models.SpecialResponseMode", "ResponseMode")
+                        .WithMany()
+                        .HasForeignKey("ResponseModeid");
+
+                    b.HasOne("Mockify.Models.ServerSettings")
+                        .WithMany("Endpoints")
+                        .HasForeignKey("ServerSettingsId");
+                });
+
             modelBuilder.Entity("Mockify.Models.ExternalUrl", b =>
                 {
                     b.HasOne("Mockify.Models.ApplicationUser")
@@ -365,15 +477,37 @@ namespace Mockify.Migrations
                         .HasForeignKey("RegisteredApplicationId");
                 });
 
+            modelBuilder.Entity("Mockify.Models.RegisteredApplication", b =>
+                {
+                    b.HasOne("Mockify.Models.RateLimits", "OverallRateLimit")
+                        .WithMany()
+                        .HasForeignKey("OverallRateLimitRateLimitsId");
+
+                    b.HasOne("Mockify.Models.UserApplicationToken", "ClientCredentialToken")
+                        .WithMany()
+                        .HasForeignKey("TokenId");
+                });
+
+            modelBuilder.Entity("Mockify.Models.ServerSettings", b =>
+                {
+                    b.HasOne("Mockify.Models.RateLimits", "RateLimits")
+                        .WithMany()
+                        .HasForeignKey("RateLimitsId");
+
+                    b.HasOne("Mockify.Models.SpecialResponseMode", "ResponseMode")
+                        .WithMany()
+                        .HasForeignKey("ResponseModeid");
+                });
+
             modelBuilder.Entity("Mockify.Models.UserApplicationToken", b =>
                 {
+                    b.HasOne("Mockify.Models.RateLimits", "AppUserRateLimits")
+                        .WithMany()
+                        .HasForeignKey("AppUserRateLimitsRateLimitsId");
+
                     b.HasOne("Mockify.Models.ApplicationUser")
                         .WithMany("UserApplicationTokens")
                         .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("Mockify.Models.ApplicationUser")
-                        .WithMany("UsersApplications")
-                        .HasForeignKey("ApplicationUserId1");
 
                     b.HasOne("Mockify.Models.RegisteredApplication")
                         .WithMany("UserApplicationTokens")

@@ -1,0 +1,75 @@
+﻿@model Mockify.ViewModels.UsersAppsViewModel
+
+@{
+    ViewData["Title"] = "Approved applications";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Mockify</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/css/Mockify.css" />
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/Mockify.min.css" asp-append-version="true" />
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    </environment>
+</head>
+<body>
+
+    <div>
+        <h4>Approved Applications</h4>
+        <hr />
+        <div class="text-green">
+            These apps have been granted access to interact with your Spotify account. To prevent them from future access, click "Revoke Access".
+        </div>
+
+        @if (!Model.Applications.Any()) {
+            <div>
+                <p>
+                    You have not authorized any applications yet.
+                </p>
+            </div>
+        }
+        else {
+            <ul>
+                @foreach (RegisteredApplication ra in Model.Applications) {
+                    <li>
+                        <div class="RegisteredApplication">
+                            <div class="appImage">BOX</div>
+                            <div class="appDetails" style="display: flex">
+                                <strong>@ra.ApplicationName</strong>
+                                <br />
+                                @ra.ApplicationDescription
+                            </div>
+                            <div class="apps-revoke">
+                                <form asp-antiforgery="true"
+                                      method="post" action="/us/account/apps/revoke/@ra.ClientId">
+                                    <button class="btn btn-link btn-sm" type="submit">Revoke Access</button>
+                                </form>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+
+    </div>
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</body>
+</html>

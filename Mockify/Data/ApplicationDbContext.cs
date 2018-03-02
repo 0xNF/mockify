@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Mockify.Models;
 using Mockify.ViewModels;
 
-namespace Mockify.Data
-{
+namespace Mockify.Data {
+
+
     public class MockifyDbContext : IdentityDbContext<ApplicationUser>
     {
         public MockifyDbContext(DbContextOptions<MockifyDbContext> options)
@@ -16,7 +16,10 @@ namespace Mockify.Data
         {
         }
 
+        public DbSet<RateLimits> RateLimits { get; set; }
+        public DbSet<ServerSettings> ServerSettings { get; set; }
         public DbSet<RegisteredApplication> Applications { get; set; }
+        public DbSet<SpecialResponseMode> ResponseModes { get; set; }
 
         public async Task<RegisteredApplication> CreateRegisteredApplication(string appname, string appdescription) {
             string newCid = await RegisteredApplication.CreateClientId(appname);
@@ -99,10 +102,7 @@ namespace Mockify.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            //builder.Entity<RegisteredApplication>().HasMany(x => x.UserApplicationTokens);
-            //builder.Entity<UserApplicationToken>().HasOne<ApplicationUser>();
-            //builder.Entity<ApplicationUser>().HasMany(x => x.UserApplicationTokens);
-
+            //builder.Entity<SpecialResponseMode>().SeedData(new SpecialResponseMode { id = SpecialResponseMode.ServiceOK.id, Description = SpecialResponseMode.ServiceOK.Description, Name = SpecialResponseMode.ServiceOK.Name });
 
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.

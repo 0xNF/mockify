@@ -1,0 +1,15 @@
+﻿@model Mockify.Models.RateLimits
+
+
+<div class="form-group">
+    <label asp-for="CallsPerWindow" class="control-label">Calls per Window</label>
+    <p>How many API calls may be made within a given time-window before the service starts rate-limiting callers.</p>    
+    <input type="number" required="required" id="inputCallsPerWindow" asp-for="CallsPerWindow" class="form-control"/>
+    <span asp-validation-for="CallsPerWindow" class="text-danger"></span>
+</div>
+<div class="form-group">
+    <label asp-for="RateWindow" class="control-label">Rate Window</label>
+    <p>Length of Time in minutes of a given Rate Window. An excess of calls within this time-span will result the caller being rate-limited</p>
+    <input type="number" required="required" id="inputRateWindow" asp-for="RateWindow.TotalMinutes" class="form-control" />
+    <span asp-validation-for="RateWindow" class="text-danger"></span>
+</div>

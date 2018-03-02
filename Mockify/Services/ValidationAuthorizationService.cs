@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Mockify.Data;
 using Mockify.Models;
 using System;
@@ -11,66 +12,21 @@ using System.Timers;
 
 namespace Mockify.Services {
 
-    public class AuthRequestClientInfo {
-        public string UserId;
-        public string ClientId;
-
-        public AuthRequestClientInfo(string userid, string clientid) {
-            this.UserId = userid;
-            this.ClientId = clientid;
-        }
-
-        public override bool Equals(object obj) {
-            if (obj is AuthRequestClientInfo that) {
-                return (that.UserId.Equals(this.UserId) && that.ClientId.Equals(this.ClientId));
-            }
-            return false;
-        }
-
-        public override int GetHashCode() {
-            var hashCode = -96061894;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(UserId);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ClientId);
-            return hashCode;
-        }
-    }
-    public class AuthRequestValidationInfo {
-        public string Code;
-        public string RedirectURI;
-
-        public AuthRequestValidationInfo(string code, string redirect) {
-            this.Code = code;
-            this.RedirectURI = redirect;
-        }
-
-
-        public override bool Equals(object obj) {
-            if (obj is AuthRequestValidationInfo that) {
-                return (that.Code.Equals(this.Code) && that.RedirectURI.Equals(this.RedirectURI));
-            }
-            return false;
-        }
-
-        public override int GetHashCode() {
-            var hashCode = 1171506621;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Code);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(RedirectURI);
-            return hashCode;
-        }
-    }
-
     public class ValidationAuthorizationService : IValidateAuthorizationService {
 
         MockifyDbContext _mc;
         UserManager<ApplicationUser> _um;
+        ILogger<ValidationAuthorizationService> _logger;
 
-        public ValidationAuthorizationService(MockifyDbContext mc, UserManager<ApplicationUser> um) {
+        public ValidationAuthorizationService(MockifyDbContext mc, UserManager<ApplicationUser> um, ILogger<ValidationAuthorizationService> logger) {
             this._mc = mc;
             this._um = um;
+            this._logger = logger;
         }
 
         public async Task<bool> CheckClientIdExists(string clientid) {
             if (String.IsNullOrWhiteSpace(clientid)) {
+                _logger.LogError("no client id was supplied");
                 return false;
             }
             // Check exists in DB...
@@ -110,7 +66,13 @@ namespace Mockify.Services {
             return ra.ClientSecret.Equals(clientSecret, StringComparison.Ordinal);
         }
 
-
+        public async Task<bool> CheckTokenNotRevoked(string user_id, string refreshToken) {
+            ApplicationUser user = await _um.Users.Where(x => x.Id.Equals(user_id)).Include(x => x.UserApplicationTokens).FirstOrDefaultAsync();
+            if(user == null) {
+                return false; //error, no user was found or database encountered an error
+            }
+            return user.UserApplicationTokens.Any(x => x.TokenValue.Equals(refreshToken));
+        }
     }
 
 
