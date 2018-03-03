@@ -9,6 +9,7 @@ Mockify attempts to be a drop-in replacement for any applications that want to t
 3) Full Spotify Object Model parity (All returned objects and headers are the same shape and contain the same information and encoding as Spotify)
 4) No worrying about Spotify's rate limits 
 5) Ability to control server side errors
+6) Ability to test against token revoke and rate limiting
 
 Mockify allows you to create users and OAuth Applications, and also models Spotify's OAuth2 log in process, allowing all 3 authentication flows.
 
