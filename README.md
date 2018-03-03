@@ -26,7 +26,7 @@ Otherwise the url scheme is the same. For instance, To request an album, instead
 
 
 ## Implementation Todo List
-Although this is currently in working order as a starting point for anyone attempting to set up an OpenIdConnectServer OAuth2 Server, it's ability to serve as a Spotify integration test suite is not yet implemented. What follows is what is left to do before it can be used fully:
+Although this is currently in working order as a starting point for anyone attempting to set up an OpenIdConnectServer OAuth2 Server, its ability to serve as a Spotify integration test suite is not yet implemented. What follows is what is left to do before it can be used fully:
 
 * Collect dummy Spotify data for each endpoint
 * Create unit tests
