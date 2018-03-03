@@ -32,6 +32,8 @@ Although this is currently in working order as a starting point for anyone attem
 * Create unit tests
 * api.localhost and accounts.localhost subdomains
 * More thorough administrative control panels
+* Rate limiting is not active
+* Server Resposne Modes are not active
 
 ## Building
 Mockify depends on .NET Core 2.0
