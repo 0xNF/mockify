@@ -18,8 +18,7 @@ namespace Mockify.Controllers {
         private readonly MockifyDbContext _mc;
         private readonly ILogger _logger;
 
-        public ServerSettingsController(
-            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, MockifyDbContext mockifyContext,  ILogger<AccountController> logger) {
+        public ServerSettingsController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, MockifyDbContext mockifyContext,  ILogger<AccountController> logger) {
             _logger = logger;
             _mc = mockifyContext;
         }
