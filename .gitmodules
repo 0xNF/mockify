@@ -1,0 +1,3 @@
+[submodule "DotNetStandardSpotifyWebApi"]
+	path = DotNetStandardSpotifyWebApi
+	url = git@github.com:0xNF/DotNetStandardSpotifyWebApi.git
