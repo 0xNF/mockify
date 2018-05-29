@@ -5,16 +5,27 @@ VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mockify", "Mockify\Mockify.csproj", "{27D010F4-3C47-436F-B232-C949CF271AA9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetStandardSpotifyWebApi", "DotNetStandardSpotifyWebApi\DotNetStandardSpotifyWebApi\DotNetStandardSpotifyWebApi.csproj", "{C9F89CC6-850A-4630-99BC-D13A1B6C7C4D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		ubtest|Any CPU = ubtest|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{27D010F4-3C47-436F-B232-C949CF271AA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{27D010F4-3C47-436F-B232-C949CF271AA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27D010F4-3C47-436F-B232-C949CF271AA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27D010F4-3C47-436F-B232-C949CF271AA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27D010F4-3C47-436F-B232-C949CF271AA9}.ubtest|Any CPU.ActiveCfg = Release|Any CPU
+		{27D010F4-3C47-436F-B232-C949CF271AA9}.ubtest|Any CPU.Build.0 = Release|Any CPU
+		{C9F89CC6-850A-4630-99BC-D13A1B6C7C4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9F89CC6-850A-4630-99BC-D13A1B6C7C4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9F89CC6-850A-4630-99BC-D13A1B6C7C4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9F89CC6-850A-4630-99BC-D13A1B6C7C4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9F89CC6-850A-4630-99BC-D13A1B6C7C4D}.ubtest|Any CPU.ActiveCfg = ubtest|Any CPU
+		{C9F89CC6-850A-4630-99BC-D13A1B6C7C4D}.ubtest|Any CPU.Build.0 = ubtest|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
